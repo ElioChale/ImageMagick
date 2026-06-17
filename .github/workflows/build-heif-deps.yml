@@ -65,8 +65,8 @@ jobs:
           cmake .. -G "Visual Studio 18 2026" -A ${{matrix.cmake_arch}} ^
             -DCMAKE_BUILD_TYPE=Release ^
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ^
-            -DCMAKE_C_FLAGS="/FI${{ github.workspace }}/msvc-compat.h" ^
-            -DCMAKE_CXX_FLAGS="/FI${{ github.workspace }}/msvc-compat.h" ^
+            -DCMAKE_C_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc" ^
+            -DCMAKE_CXX_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc" ^
             -DBUILD_SHARED_LIBS=${{matrix.buildType == 'dynamic' && 'ON' || 'OFF'}} ^
             -DENABLE_SDL=OFF ^
             -DENABLE_DECODER=OFF ^
@@ -87,8 +87,8 @@ jobs:
           cmake .. -G "Visual Studio 18 2026" -A ${{matrix.cmake_arch}} ^
             -DCMAKE_BUILD_TYPE=Release ^
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ^
-            -DCMAKE_C_FLAGS="/FI${{ github.workspace }}/msvc-compat.h" ^
-            -DCMAKE_CXX_FLAGS="/FI${{ github.workspace }}/msvc-compat.h" ^
+            -DCMAKE_C_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc" ^
+            -DCMAKE_CXX_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc" ^
             -DBUILD_SHARED_LIBS=${{matrix.buildType == 'dynamic' && 'ON' || 'OFF'}} ^
             -DWITH_EXAMPLES=OFF ^
             -DWITH_GDK_PIXBUF=OFF ^
