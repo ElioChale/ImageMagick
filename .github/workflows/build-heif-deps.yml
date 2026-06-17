@@ -81,7 +81,8 @@ jobs:
             -DWITH_GDK_PIXBUF=OFF ^
             -DENABLE_PLUGIN_LOADING=OFF ^
             -DWITH_LIBDE265=ON ^
-            -DCMAKE_PREFIX_PATH=../../libde265/build ^
+            -DLIBDE265_INCLUDE_DIR=../../libde265 ^
+            -DLIBDE265_LIBRARY=../../libde265/build/libde265/Release/libde265.lib ^
             -DWITH_X265=OFF ^
             -DWITH_AOM_ENCODER=OFF ^
             -DWITH_AOM_DECODER=OFF ^
@@ -97,7 +98,7 @@ jobs:
         shell: cmd
         working-directory: libheif
         run: |
-          cmake --build build --config Release --parallel --target heif
+          cmake --build build --config Release --parallel
 
       - name: Package HEIF dependencies
         shell: pwsh
