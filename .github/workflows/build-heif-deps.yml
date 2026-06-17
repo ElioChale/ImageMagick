@@ -44,6 +44,7 @@ jobs:
           cd build
           cmake .. -G "Visual Studio 18 2026" -A ${{matrix.architecture}} ^
             -DCMAKE_BUILD_TYPE=Release ^
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ^
             -DBUILD_SHARED_LIBS=${{matrix.buildType == 'dynamic' && 'ON' || 'OFF'}} ^
             -DENABLE_SDL=OFF ^
             -DENABLE_DECODER=OFF ^
@@ -63,6 +64,7 @@ jobs:
           cd build
           cmake .. -G "Visual Studio 18 2026" -A ${{matrix.architecture}} ^
             -DCMAKE_BUILD_TYPE=Release ^
+            -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ^
             -DBUILD_SHARED_LIBS=${{matrix.buildType == 'dynamic' && 'ON' || 'OFF'}} ^
             -DWITH_EXAMPLES=OFF ^
             -DWITH_GDK_PIXBUF=OFF ^
