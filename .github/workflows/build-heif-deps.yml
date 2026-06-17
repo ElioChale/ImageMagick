@@ -78,12 +78,6 @@ jobs:
         run: |
           cmake --build build --config Release --parallel
 
-      - name: List libde265 outputs
-        shell: cmd
-        run: |
-          dir /s /b libde265\build\*.lib 2>nul || echo No .lib files found
-          dir /s /b libde265\build\*.dll 2>nul || echo No .dll files found
-
       - name: Configure libheif
         shell: cmd
         working-directory: libheif
@@ -97,6 +91,7 @@ jobs:
             -DCMAKE_CXX_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc /wd4805 /I${{ github.workspace }}/libde265/build" ^
             -DBUILD_SHARED_LIBS=${{matrix.buildType == 'dynamic' && 'ON' || 'OFF'}} ^
             -DWITH_EXAMPLES=OFF ^
+            -DBUILD_TESTING=OFF ^
             -DWITH_GDK_PIXBUF=OFF ^
             -DENABLE_PLUGIN_LOADING=OFF ^
             -DWITH_LIBDE265=ON ^
