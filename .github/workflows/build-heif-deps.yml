@@ -1,0 +1,149 @@
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 8 * * 0'
+
+permissions:
+  contents: write
+
+name: Build HEIF Dependencies
+
+jobs:
+  build:
+    name: Build libheif ${{matrix.buildType}} ${{matrix.architecture}}
+    runs-on: windows-2025-vs2026
+
+    strategy:
+      fail-fast: false
+      matrix:
+        architecture: [x64, arm64, x86]
+        buildType: [dynamic, static]
+
+    steps:
+      - name: Clone libde265
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+        with:
+          repository: strukturag/libde265
+          ref: refs/tags/v1.0.15
+          path: libde265
+          persist-credentials: false
+
+      - name: Clone libheif
+        uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
+        with:
+          repository: strukturag/libheif
+          ref: refs/tags/v1.20.2
+          path: libheif
+          persist-credentials: false
+
+      - name: Configure libde265
+        shell: cmd
+        working-directory: libde265
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G "Visual Studio 18 2026" -A ${{matrix.architecture}} ^
+            -DCMAKE_BUILD_TYPE=Release ^
+            -DBUILD_SHARED_LIBS=${{matrix.buildType == 'dynamic' && 'ON' || 'OFF'}} ^
+            -DENABLE_SDL=OFF ^
+            -DENABLE_DECODER=OFF ^
+            -DDISABLE_SSE=${{matrix.architecture == 'arm64' && 'ON' || 'OFF'}}
+
+      - name: Build libde265
+        shell: cmd
+        working-directory: libde265
+        run: |
+          cmake --build build --config Release --parallel
+
+      - name: Configure libheif
+        shell: cmd
+        working-directory: libheif
+        run: |
+          mkdir build
+          cd build
+          cmake .. -G "Visual Studio 18 2026" -A ${{matrix.architecture}} ^
+            -DCMAKE_BUILD_TYPE=Release ^
+            -DBUILD_SHARED_LIBS=${{matrix.buildType == 'dynamic' && 'ON' || 'OFF'}} ^
+            -DWITH_EXAMPLES=OFF ^
+            -DWITH_GDK_PIXBUF=OFF ^
+            -DENABLE_PLUGIN_LOADING=OFF ^
+            -DWITH_LIBDE265=ON ^
+            -Dlibde265_DIR=../libde265/build ^
+            -DWITH_X265=OFF ^
+            -DWITH_AOM_ENCODER=OFF ^
+            -DWITH_AOM_DECODER=OFF ^
+            -DWITH_DAV1D=OFF ^
+            -DWITH_SvtEnc=OFF ^
+            -DWITH_RAV1E=OFF ^
+            -DWITH_JPEG_DECODER=OFF ^
+            -DWITH_JPEG_ENCODER=OFF ^
+            -DWITH_OpenJPEG_DECODER=OFF ^
+            -DWITH_OpenJPEG_ENCODER=OFF
+
+      - name: Build libheif
+        shell: cmd
+        working-directory: libheif
+        run: |
+          cmake --build build --config Release --parallel
+
+      - name: Package HEIF dependencies
+        shell: pwsh
+        run: |
+          $arch = "${{matrix.architecture}}"
+          $buildType = "${{matrix.buildType}}"
+
+          New-Item -ItemType Directory -Force -Path "package\include\libheif"
+          New-Item -ItemType Directory -Force -Path "package\lib"
+          if ($buildType -eq "dynamic") {
+            New-Item -ItemType Directory -Force -Path "package\bin"
+          }
+
+          # Copy libheif headers
+          Copy-Item "libheif\libheif\*.h" "package\include\libheif\"
+
+          # Copy libde265 libraries
+          Copy-Item "libde265\build\libde265\Release\*" "package\lib\"
+          if ($buildType -eq "dynamic") {
+            Copy-Item "libde265\build\libde265\Release\*.dll" "package\bin\"
+          }
+
+          # Copy libheif libraries
+          Copy-Item "libheif\build\libheif\Release\*" "package\lib\"
+          if ($buildType -eq "dynamic") {
+            Copy-Item "libheif\build\libheif\Release\*.dll" "package\bin\"
+          }
+
+          $zipName = "libheif-windows-$arch-$buildType.zip"
+          Compress-Archive -Path "package\*" -DestinationPath $zipName
+          echo "zipName=$zipName" >> $env:GITHUB_ENV
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
+        with:
+          name: libheif-windows-${{matrix.architecture}}-${{matrix.buildType}}
+          path: libheif-windows-${{matrix.architecture}}-${{matrix.buildType}}.zip
+
+  publish:
+    name: Publish HEIF Dependencies Release
+    needs: build
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.0.1
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{github.token}}
+        run: |
+          gh release delete "heif-deps-v1.20.2" --yes || true
+          gh release create "heif-deps-v1.20.2" \
+            --title "libheif v1.20.2 Windows Binaries" \
+            --notes "Pre-built libheif v1.20.2 + libde265 v1.0.15 for Windows (MSVC).
+          Architectures: x64, arm64, x86.
+          Build types: dynamic (DLL), static (LIB).
+          Built with Visual Studio 2026." \
+            artifacts/*.zip

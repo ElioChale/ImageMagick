@@ -157,6 +157,12 @@ jobs:
         run: |
           ImageMagick\.github\build\windows\download-dependencies.cmd windows-${{matrix.architecture}}-static-openMP.zip
 
+      - name: Download HEIF dependencies
+        shell: cmd
+        run: |
+          ImageMagick\.github\build\windows\download-heif.cmd ${{matrix.architecture}} static
+        continue-on-error: true
+
       - name: Configure ImageMagick
         shell: cmd
         working-directory: Configure

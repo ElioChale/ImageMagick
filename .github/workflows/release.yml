@@ -151,6 +151,12 @@ jobs:
         run: |
           ImageMagick\.github\build\windows\download-dependencies.cmd windows-${{matrix.architecture}}-${{matrix.buildType}}-openMP.zip
 
+      - name: Download HEIF dependencies
+        shell: cmd
+        run: |
+          ImageMagick\.github\build\windows\download-heif.cmd ${{matrix.architecture}} ${{matrix.buildType}}
+        continue-on-error: true
+
       - name: Download ChangeLog.md
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.0.1
         with:
@@ -190,6 +196,12 @@ jobs:
           directory: ${{ github.workspace }}\Artifacts\bin
           files: '*.exe *.dll'
 
+      - name: Patch installer for HEIF
+        if: ${{matrix.buildType == 'dynamic'}}
+        shell: pwsh
+        run: |
+          ImageMagick\.github\build\windows\patch-installer.ps1 -BuildType ${{matrix.buildType}}
+
       - name: Create installer
         shell: cmd
         run: |
@@ -204,6 +216,17 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
           directory: ${{ github.workspace }}\Configure\Installer\Inno\Artifacts
           files: '*.exe'
+
+      - name: Verify HEIC support
+        shell: cmd
+        run: |
+          Artifacts\bin\magick.exe -list format | findstr /i "HEIC"
+          if %ERRORLEVEL% NEQ 0 (
+            echo "WARNING: HEIC format not registered in this build"
+          ) else (
+            echo "HEIC format is registered"
+          )
+        continue-on-error: true
 
       - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
         with:
@@ -292,6 +315,12 @@ jobs:
         shell: cmd
         run: |
           ImageMagick\.github\build\windows\download-dependencies.cmd windows-${{matrix.architecture}}-static-openMP-linked-runtime.zip
+
+      - name: Download HEIF dependencies
+        shell: cmd
+        run: |
+          ImageMagick\.github\build\windows\download-heif.cmd ${{matrix.architecture}} static
+        continue-on-error: true
 
       - name: Download ChangeLog.md
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c #v8.0.1
