@@ -78,6 +78,12 @@ jobs:
         run: |
           cmake --build build --config Release --parallel
 
+      - name: List libde265 outputs
+        shell: cmd
+        run: |
+          dir /s /b libde265\build\*.lib 2>nul || echo No .lib files found
+          dir /s /b libde265\build\*.dll 2>nul || echo No .dll files found
+
       - name: Configure libheif
         shell: cmd
         working-directory: libheif
@@ -95,7 +101,7 @@ jobs:
             -DENABLE_PLUGIN_LOADING=OFF ^
             -DWITH_LIBDE265=ON ^
             -DLIBDE265_INCLUDE_DIR=../../libde265 ^
-            -DLIBDE265_LIBRARY=../../libde265/build/libde265/Release/libde265 ^
+            -DCMAKE_LIBRARY_PATH=../../libde265/build/libde265/Release ^
             -DWITH_X265=OFF ^
             -DWITH_AOM_ENCODER=OFF ^
             -DWITH_AOM_DECODER=OFF ^
