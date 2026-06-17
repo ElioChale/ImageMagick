@@ -8,7 +8,7 @@ download_heif()
 
   echo "Downloading HEIF dependencies for ${arch}-${build_type}"
 
-  local version="heif-deps-v1.20.2"
+  local version="heif-deps-v1.23.0"
   local zip=""
 
   case "$build_type" in

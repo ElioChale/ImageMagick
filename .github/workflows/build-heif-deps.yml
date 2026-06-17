@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
         with:
           repository: strukturag/libde265
-          ref: refs/tags/v1.0.15
+          ref: refs/tags/v1.1.1
           path: libde265
           persist-credentials: false
 
@@ -32,16 +32,9 @@ jobs:
         uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 #v6.0.3
         with:
           repository: strukturag/libheif
-          ref: refs/tags/v1.20.2
+          ref: refs/tags/v1.23.0
           path: libheif
           persist-credentials: false
-
-      - name: Patch CMakeLists minimum version
-        shell: pwsh
-        run: |
-          (Get-Content libde265\CMakeLists.txt) -replace 'cmake_minimum_required\(\s*VERSION\s+\d+\.\d+\s*\)', 'cmake_minimum_required(VERSION 3.5)' | Set-Content libde265\CMakeLists.txt
-          (Get-Content libheif\CMakeLists.txt) -replace 'cmake_minimum_required\(\s*VERSION\s+\d+\.\d+\s*\)', 'cmake_minimum_required(VERSION 3.5)' | Set-Content libheif\CMakeLists.txt
-          Write-Output "Patched cmake_minimum_required in both projects"
 
       - name: Configure libde265
         shell: cmd
@@ -148,10 +141,10 @@ jobs:
         env:
           GH_TOKEN: ${{github.token}}
         run: |
-          gh release delete "heif-deps-v1.20.2" --yes || true
-          gh release create "heif-deps-v1.20.2" \
-            --title "libheif v1.20.2 Windows Binaries" \
-            --notes "Pre-built libheif v1.20.2 + libde265 v1.0.15 for Windows (MSVC).
+          gh release delete "heif-deps-v1.23.0" --yes || true
+          gh release create "heif-deps-v1.23.0" \
+            --title "libheif v1.23.0 Windows Binaries" \
+            --notes "Pre-built libheif v1.23.0 + libde265 v1.1.1 for Windows (MSVC).
           Architectures: x64, arm64, x86.
           Build types: dynamic (DLL), static (LIB).
           Built with Visual Studio 2026." \
