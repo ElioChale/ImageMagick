@@ -88,14 +88,14 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release ^
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ^
             -DCMAKE_C_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc /I../../libde265/build" ^
-            -DCMAKE_CXX_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc /I${{ github.workspace }}/libde265/build" ^
+            -DCMAKE_CXX_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc /wd4805 /I${{ github.workspace }}/libde265/build" ^
             -DBUILD_SHARED_LIBS=${{matrix.buildType == 'dynamic' && 'ON' || 'OFF'}} ^
             -DWITH_EXAMPLES=OFF ^
             -DWITH_GDK_PIXBUF=OFF ^
             -DENABLE_PLUGIN_LOADING=OFF ^
             -DWITH_LIBDE265=ON ^
             -DLIBDE265_INCLUDE_DIR=../../libde265 ^
-            -DLIBDE265_LIBRARY=../../libde265/build/libde265/Release/libde265.lib ^
+            -DLIBDE265_LIBRARY=../../libde265/build/libde265/Release/libde265 ^
             -DWITH_X265=OFF ^
             -DWITH_AOM_ENCODER=OFF ^
             -DWITH_AOM_DECODER=OFF ^
