@@ -69,7 +69,7 @@ jobs:
             -DCMAKE_CXX_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc" ^
             -DBUILD_SHARED_LIBS=${{matrix.buildType == 'dynamic' && 'ON' || 'OFF'}} ^
             -DENABLE_SDL=OFF ^
-            -DENABLE_DECODER=OFF ^
+            -DENABLE_DECODER=ON ^
             -DDISABLE_SSE=${{matrix.architecture == 'arm64' && 'ON' || 'OFF'}}
 
       - name: Build libde265
@@ -88,7 +88,7 @@ jobs:
             -DCMAKE_BUILD_TYPE=Release ^
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ^
             -DCMAKE_C_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc /I../../libde265/build" ^
-            -DCMAKE_CXX_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc /I../../libde265/build" ^
+            -DCMAKE_CXX_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc /I${{ github.workspace }}/libde265/build" ^
             -DBUILD_SHARED_LIBS=${{matrix.buildType == 'dynamic' && 'ON' || 'OFF'}} ^
             -DWITH_EXAMPLES=OFF ^
             -DWITH_GDK_PIXBUF=OFF ^
