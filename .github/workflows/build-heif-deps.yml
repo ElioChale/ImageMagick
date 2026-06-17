@@ -1,5 +1,12 @@
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build-heif-deps.yml
+      - .github/build/windows/download-heif.sh
+      - .github/build/windows/download-heif.cmd
   schedule:
     - cron: '0 8 * * 0'
 
