@@ -105,7 +105,8 @@ jobs:
             -DWITH_JPEG_DECODER=OFF ^
             -DWITH_JPEG_ENCODER=OFF ^
             -DWITH_OpenJPEG_DECODER=OFF ^
-            -DWITH_OpenJPEG_ENCODER=OFF
+            -DWITH_OpenJPEG_ENCODER=OFF ^
+            -DDOXYGEN_EXECUTABLE=NO
 
       - name: Build libheif
         shell: cmd
