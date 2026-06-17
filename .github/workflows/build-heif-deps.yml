@@ -87,8 +87,8 @@ jobs:
           cmake .. -G "Visual Studio 18 2026" -A ${{matrix.cmake_arch}} ^
             -DCMAKE_BUILD_TYPE=Release ^
             -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ^
-            -DCMAKE_C_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc /I../../libde265/build" ^
-            -DCMAKE_CXX_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc /wd4805 /I${{ github.workspace }}/libde265/build" ^
+            -DCMAKE_C_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc /I${{ github.workspace }}/libde265/build" ^
+            -DCMAKE_CXX_FLAGS="/FI${{ github.workspace }}/msvc-compat.h /EHsc /I${{ github.workspace }}/libde265/build" ^
             -DBUILD_SHARED_LIBS=${{matrix.buildType == 'dynamic' && 'ON' || 'OFF'}} ^
             -DWITH_EXAMPLES=OFF ^
             -DBUILD_TESTING=OFF ^
@@ -144,7 +144,6 @@ jobs:
 
           $zipName = "libheif-windows-$arch-$buildType.zip"
           Compress-Archive -Path "package\*" -DestinationPath $zipName
-          echo "zipName=$zipName" >> $env:GITHUB_ENV
 
       - name: Upload artifact
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a #v7.0.1
@@ -177,6 +176,7 @@ jobs:
           gh release create "heif-deps-v1.23.0" \
             --title "libheif v1.23.0 Windows Binaries" \
             --notes "Pre-built libheif v1.23.0 + libde265 v1.1.1 for Windows (MSVC).
+
           Architectures: x64, arm64, x86.
           Build types: dynamic (DLL), static (LIB).
           Built with Visual Studio 2026." \
