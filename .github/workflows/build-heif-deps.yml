@@ -36,6 +36,13 @@ jobs:
           path: libheif
           persist-credentials: false
 
+      - name: Patch CMakeLists minimum version
+        shell: pwsh
+        run: |
+          (Get-Content libde265\CMakeLists.txt) -replace 'cmake_minimum_required\(\s*VERSION\s+\d+\.\d+\s*\)', 'cmake_minimum_required(VERSION 3.5)' | Set-Content libde265\CMakeLists.txt
+          (Get-Content libheif\CMakeLists.txt) -replace 'cmake_minimum_required\(\s*VERSION\s+\d+\.\d+\s*\)', 'cmake_minimum_required(VERSION 3.5)' | Set-Content libheif\CMakeLists.txt
+          Write-Output "Patched cmake_minimum_required in both projects"
+
       - name: Configure libde265
         shell: cmd
         working-directory: libde265
